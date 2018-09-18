@@ -2,8 +2,11 @@ FROM nginx:alpine
 
 LABEL maintainer="John Graham"
 
+RUN rm -rf /var/cache/apk/* && \
+    rm -rf /tmp/*
+
 # Install deps before we add our project to cache this layer
-RUN apk add --no-cache gcc python py2-pip python-dev musl-dev libffi-dev openssl openssl-dev
+RUN apk add --no-cache gcc python py2-pip python-dev musl-dev libffi-dev openssl openssl-dev uwsgi-python
 
 # Lets also cache the install of Flask into it's own layer
 ADD ./requirements.txt /app/
@@ -23,6 +26,7 @@ COPY ./app.ini /app.ini
 
 # Copy the uid_entrypoint script for running in Openshift
 COPY ./uid_entrypoint /uid_entrypoint
+COPY ./entrypoint.sh /entrypoint.sh
 
 RUN touch /var/run/nginx.pid && \
   chown -R www-data:www-data /var/run/nginx.pid && \
@@ -34,4 +38,4 @@ RUN chown -R www-data:www-data /app/*
 USER www-data
 
 WORKDIR /app
-ENTRYPOINT [ "uid_entrypoint" ]
+#ENTRYPOINT [ "/entrypoint.sh" ]
