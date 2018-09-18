@@ -11,8 +11,11 @@ RUN apk add --no-cache gcc python py2-pip python-dev musl-dev libffi-dev openssl
 # Lets also cache the install of Flask into it's own layer
 ADD ./requirements.txt /app/
 
-RUN pip install -r /app/requirements.txt && \
-    apk del gcc git py2-pip python-dev musl-dev libffi-dev openssl-dev
+# Install Python requirements
+RUN pip install -r /app/requirements.txt
+
+# Clean up python development utilities
+RUN apk del gcc git py2-pip python-dev musl-dev libffi-dev openssl-dev
 
 # Create the user and group
 RUN addgroup -g 10001 -S www-data
